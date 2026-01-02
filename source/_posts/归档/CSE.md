@@ -77,7 +77,7 @@ excerpt: " "
   5. 易用性
 
 - 可用性和可靠性
-  ![](https://image.blog.nwdnysl.site/a35881e330d0ef3e985cd7eeda006ce-8d2db5a39f9368ae7314306dabd1078a.png)
+  ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/a35881e330d0ef3e985cd7eeda006ce-8d2db5a39f9368ae7314306dabd1078a.png)
 
 ## LEC 3: File System 1
 
@@ -104,7 +104,7 @@ excerpt: " "
     - 一个文件拥有一个 inode（index node）其会存储文件的元数据 包括这个文件有哪些块以及 file 的 size
     - 提供的映射是 inode 中的 block index 到 disk 上的 block number 比如 inode-1 的第 3 个 block 对应的 block number 是 178 利用这个映射 就可以实现从 inode offset 到 block data 的映射
     - inode 对于大文件来说会很大 所以会做多层映射（类似多级页表）也就是 inode 指向另一个 inode
-      ![](https://image.blog.nwdnysl.site/28260098dd030d051d78ed86c64ed95-a639d84c28f8bea9751e0d05e11b4405.png)
+      ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/28260098dd030d051d78ed86c64ed95-a639d84c28f8bea9751e0d05e11b4405.png)
 
   - L3：Inode Number 层
 
@@ -116,7 +116,7 @@ excerpt: " "
     - 已经可以提供 inode number 到 block data 的映射 比如 inode number 为 1、offset 为 4096 的 block 是哪个
     - 已经足以用于操作文件 但是使用 inode number 操作对于用户不友好 并且在不同的设备上 inode number 会不同 因此引入了文件名
     - 数据分布图
-      ![](https://image.blog.nwdnysl.site/d4115c80d298d879660f6c72083863a-e80cf83af3d31c01c3ad512c61e9a4a2.png)
+      ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/d4115c80d298d879660f6c72083863a-e80cf83af3d31c01c3ad512c61e9a4a2.png)
 
   - L4：File Name 层
 
@@ -136,20 +136,20 @@ excerpt: " "
       1. 先 unlink to_name 然后 link from_name 到 to_name 最后 unlink from_name 通常会在 tmp 文件里操作 如果中途崩溃 to_name 就会丢失 需要原子性
       2. 抛弃第一步 unlink to_name 这样即使中途崩溃 to_name 也不会丢失
 
-      ![](https://image.blog.nwdnysl.site/e7467e6c3a156e34ea5a788a1bba2a8-617e698c43e7c3b1c4adb66934a50896.png)
+      ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/e7467e6c3a156e34ea5a788a1bba2a8-617e698c43e7c3b1c4adb66934a50896.png)
 
   - L6：Absolute path name 层
 
     - 每个用户都有自己的 pwd 也就是 home 但是不同用户无法访问其他用户的文件 为此引入了根目录`/` 根目录的 inode number 为 1
     - 如何找到一个文件
-      ![](https://image.blog.nwdnysl.site/94f2e65ce0c5ff408ec6ff450b2efe0-fcaf4f93ce29b54f44cbfe9400d77af0.png)
+      ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/94f2e65ce0c5ff408ec6ff450b2efe0-fcaf4f93ce29b54f44cbfe9400d77af0.png)
 
   - L7：Symbolic Link 层（软链接）
 
     - 不同的磁盘上 inode number 会不同 为了能够访问其他磁盘的文件 引入软链接
     - 硬链接指向了 inode 而软链接记录了路径这个字符串 因此文件即使不存在也可以创建软链接
     - bash 在 cd 一个软链接后 会自动记住旧的 pwd 从而`cd ..`可以回到原来的目录 如果需要真正的上级目录 可以使用`cd -P ..` 会回到新的 pwd 的上级目录
-    - LINK 不能成环 ![](https://image.blog.nwdnysl.site/2f0ca416a0b5341bbd228b92aaf3951-5b6fc8a803eb3b2a18f3eb84ede9d3ba.png)
+    - LINK 不能成环 ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/2f0ca416a0b5341bbd228b92aaf3951-5b6fc8a803eb3b2a18f3eb84ede9d3ba.png)
 
 - Summary
   - 文件名不是文件的一部分 而是存在 directory 里的一个字符串 正因此 重命名实际上只能通过创建新文件来实现
@@ -191,14 +191,14 @@ excerpt: " "
   - 根据 fd 找到 file_table 中的 inode 修改 inode 的 atime 读取 block data 到 buffer 里 最后修改 cursor
   - 由于每次 read 都会导致对于 inode 的写（要修改 atime）linux 提供参数 no-atime 使得当最后关闭文件时才进行修改
   - READ 的过程
-    ![](https://image.blog.nwdnysl.site/a0215d8cccc2d6e73c8a49b51b11413-87429bea803c8909807b6f21cf8c5109.png)
+    ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/a0215d8cccc2d6e73c8a49b51b11413-87429bea803c8909807b6f21cf8c5109.png)
 
 - WRITE
 
   - 与 READ 类似 分配新的 block 并写入数据 修改 inode 的 mtime 和 size
   - 写时顺序应该采用更新 block bitmap、写入新数据、更新 inode 虽然此种顺序在极端情况下会产生硬盘浪费 但是可以通过扫描磁盘来恢复 在写入数据前就更新 inode 会导致其指向一块已经被删除的数据 从而导致数据泄露
   - WRITE 的过程
-    ![](https://image.blog.nwdnysl.site/1defd9af643cf7fb89a3b627814a2f4-df08938a29f2e1765bc2fec9f8cf1c78.png)
+    ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/1defd9af643cf7fb89a3b627814a2f4-df08938a29f2e1765bc2fec9f8cf1c78.png)
 
 - APPEND
 
@@ -245,7 +245,7 @@ excerpt: " "
     - 将结果放入响应
     - 发送响应
   - 通过 stub 我们在不修改原来函数的情况下实现了远程调用
-  - 一次 RPC 调用：![](https://image.blog.nwdnysl.site/ee6934bce9d4e6ba8bacf78d401134f-5711d9ace6572de534c41fec3602fc5e.png)
+  - 一次 RPC 调用：![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/ee6934bce9d4e6ba8bacf78d401134f-5711d9ace6572de534c41fec3602fc5e.png)
 
 - 客户端和服务器通过 message 来通信
 
@@ -419,7 +419,7 @@ excerpt: " "
     2. client 等待确认收到数据 然后发送一个 write request 给 primary primary 决定好写操作的顺序后再写入 一旦所有写入都确定成功 primary 会返回成功信息给 client
     - 这是一种数据流和控制流分离的设计 一阶段是数据流 二阶段是控制流
     - 好处是：
-      ![](https://image.blog.nwdnysl.site/89f7619b9c99ccf2e128a055daa9943-c3d8b1327916a82ff44005d061314776.png)
+      ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/89f7619b9c99ccf2e128a055daa9943-c3d8b1327916a82ff44005d061314776.png)
 - GFS 的 naming 是单纯的 flat naming 没有目录结构
 
 ## LEC 7: Key-Value Store
@@ -549,7 +549,7 @@ excerpt: " "
       - 为了解决这个问题 引入 primary
       - primary 会为每一个写分配 CSN（Commit Sequence Number） 分配到 CSN 的写都是 stable 的
       - 不过会出现 reorder 现象
-        ![](https://image.blog.nwdnysl.site/beb3d9a3fd6ee61188a6162b2fde6df-0e94aa2a47467c2d0507890af17cfdd2.png)
+        ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/beb3d9a3fd6ee61188a6162b2fde6df-0e94aa2a47467c2d0507890af17cfdd2.png)
 
 #### synchoronized clock time
 
@@ -651,7 +651,7 @@ excerpt: " "
         - 如果事务在上一次 CKPT 后提交 且在 CKPT 后才开始 则需要 redo log
         - 如果事务在上一次 CKPT 后提交 且在 CKPT 前就开始 则需要 redo log 和 CKPT
 
-      ![](https://image.blog.nwdnysl.site/b1b799162db307b7857c2cde981e3f9-bab5db0ef5de7cf54c39650dd1a4ab99.png)
+      ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/b1b799162db307b7857c2cde981e3f9-bab5db0ef5de7cf54c39650dd1a4ab99.png)
 
   - Undo-Redo vs Redo-Only vs Undo-Only
     - REDO
@@ -787,14 +787,14 @@ excerpt: " "
      - 初始化 read set 和 write set
      - 遇到 READ：如果 read set 中已经有这个数据项 则返回 set 中的数据 否则从数据库中读取数据
      - 遇到 WRITE：把数据写入 write set 如果 read set 中有这个数据项 则修改 read set 中的数据 **（此处似乎有点问题 应该是如果整个事务需要读取这个数据项 则修改 read set 中的数据？）**
-       ![](https://image.blog.nwdnysl.site/629518f9b20b9e7e8272150bf902cf4-72372aff2ab35b1bd33f1b8a9653c059.png)
+       ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/629518f9b20b9e7e8272150bf902cf4-72372aff2ab35b1bd33f1b8a9653c059.png)
   2. Validation serializability in critical section
      - 对于 read set 中的每一个数据项 检查是否和数据库中的数据一致 如果不一致则终止
      - 为了防止 ABA 问题 可以记录每一个数据项的版本号 比较版本号即可
-       ![](https://image.blog.nwdnysl.site/5d7ff64e1d1877294449aab9a6034e8-2b64de667339ff16bdba67bb548f8fc8.png)
+       ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/5d7ff64e1d1877294449aab9a6034e8-2b64de667339ff16bdba67bb548f8fc8.png)
   3. Commit or abort in critical section
      - 验证成功 则对于 write set 中的每一个数据项写入数据库
-       ![](https://image.blog.nwdnysl.site/6aedd1808096cccf5b00d761e6508e7-afba865b91e01080c2f5ac23f9026492.png)
+       ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/6aedd1808096cccf5b00d761e6508e7-afba865b91e01080c2f5ac23f9026492.png)
 
 - Critical Section 指的是第 2、3 步也需要保证 before-or-after atomicity 确保验证到提交中间没有其他事务修改数据导致的 race condition
 
@@ -813,7 +813,7 @@ excerpt: " "
       - 此时 A 和 B 都被改为 A+B 显然不符合冲突串行化的定义
       - 原因是虽然 T1 只写入 A 但是写入 A 的操作对于 B 有数据依赖 需要确保读取 B 和写入 A 之间不能被其他事务读取
       - 解决方法也很简单 一个读取发生在其他事务的读取和写入之间 意味着读取后别的事务进行了写入 我们只需要检测这种情况即可 别的事务进行了写入之前一定会获取锁 因此在验证时 除了判断数据是否被修改 还需要判断锁是否被获取 也即数据是否正在被其他事务修改
-        ![](https://image.blog.nwdnysl.site/cfca44f6f46869dfca1b46c14691ec3-f62c3c0ab47c5509ea71276d27600f01.png)
+        ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/cfca44f6f46869dfca1b46c14691ec3-f62c3c0ab47c5509ea71276d27600f01.png)
 
 - Advantages
 
@@ -902,7 +902,7 @@ excerpt: " "
     - 也即事务写入时 有一段时间数据库里的版本是不完整的
   - 为了保证写的 Isolation 在执行写入之前为每个数据项上锁 等到写完这个数据项后放锁 如果其他事务读取数据时有锁 则等待 这样就不会读取到 partial snapshot
 - 在写入数据库前 还需要检查 write set 中数据在数据库中的版本号是否大于开始时间戳 如果是则意味着有并发事务 终止事务
-- 最终实现：![](https://image.blog.nwdnysl.site/b27101bfacda96e75ce51439d213150-6ea217269cc3ed3718e6e04a87c6f195.png)
+- 最终实现：![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/b27101bfacda96e75ce51439d213150-6ea217269cc3ed3718e6e04a87c6f195.png)
 - garbage collection：定期清理旧版本数据 维护所有事务的最小开始时间戳 一旦这个时间戳大于版本号 数据就可以被删除
 - Write skew anomaly
   - 让我们看一个例子：
@@ -1040,7 +1040,7 @@ excerpt: " "
 - Phase 0
   - client 发送一个请求给所有的 proposer
 
-![](https://image.blog.nwdnysl.site/9e210cf266f7b1aec9a69d7c56ade98-cc73a9d94b2c8129dced78fb653e2025.png)
+![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/9e210cf266f7b1aec9a69d7c56ade98-cc73a9d94b2c8129dced78fb653e2025.png)
 
 - Phase 1a（prepare）
   - 一个节点决定成为 leader
@@ -1051,7 +1051,7 @@ excerpt: " "
     - 回复 leader 之前**accept**过最大的 proposal
   - 否则回复拒绝
 
-![](https://image.blog.nwdnysl.site/20241120212310-a83f2b8ee8d86c584c54ea8950447bdc.png)
+![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20241120212310-a83f2b8ee8d86c584c54ea8950447bdc.png)
 
 - Phase 2a（accept）
   - leader 收到至少半数的 ok 后（而不是 reject）
@@ -1065,13 +1065,13 @@ excerpt: " "
       - 发送 accepted message 给 proposer 和 learner
     - 否则拒绝
 
-![](https://image.blog.nwdnysl.site/8eb40d3bd5c9b10ff3422cdd5690647-c9953b31d716f3003929d03a1c76a274.png)
+![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/8eb40d3bd5c9b10ff3422cdd5690647-c9953b31d716f3003929d03a1c76a274.png)
 
 - Phase 3（learn？）
   - leader 收到半数以上节点的 accepted message 把 decide message 发送给所有节点
   - 否则稍作 delay 后重试
 
-![](https://image.blog.nwdnysl.site/090cfb7db01d6732bd6e4d9e0b8f7bc-d2e72c9b5058808b9c3b497e25548dd0.png)
+![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/090cfb7db01d6732bd6e4d9e0b8f7bc-d2e72c9b5058808b9c3b497e25548dd0.png)
 
 ##### Inside of Paxos
 
@@ -1218,10 +1218,10 @@ excerpt: " "
 
 #### Pesudo Code
 
-- 变量：![](https://image.blog.nwdnysl.site/20250115194428-b52458bb44df30a113a827c4d06ebf40.png)
-- RequestVote RPC：![](https://image.blog.nwdnysl.site/20250115195053-b41c5e190b8e7683cb664370320647d9.png)
-- AppendEntries RPC：![](https://image.blog.nwdnysl.site/20250115194818-7c4b727eebea568c10225c55ccd64a58.png)
-  ![](https://image.blog.nwdnysl.site/20250115194829-85600c3fdd11662831e4cdfbe823b234.png)
+- 变量：![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115194428-b52458bb44df30a113a827c4d06ebf40.png)
+- RequestVote RPC：![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115195053-b41c5e190b8e7683cb664370320647d9.png)
+- AppendEntries RPC：![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115194818-7c4b727eebea568c10225c55ccd64a58.png)
+  ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115194829-85600c3fdd11662831e4cdfbe823b234.png)
 
 #### Snapshot
 
@@ -1315,7 +1315,7 @@ excerpt: " "
           - P1、P2、P4 是校验位 用 P3、P5、P6、P7 的异或来计算
           - 3 个校验位出错的可能有 7 种 即 P1 出错、P2 出错、P1&P2 出错...P1 & P2 & P4 出错 刚好包含了 7 个位 对应 7 种错误
           - 海明编码保证了出错的校验位之和就是出错的位 比如 P1 & P2 出错代表了第 3 位出错
-          - ![](https://image.blog.nwdnysl.site/20250115200124-678ebd33876f5ac55c7d26bc93765436.png)
+          - ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115200124-678ebd33876f5ac55c7d26bc93765436.png)
 
 ## LEC 18: Network: Network Layer
 
@@ -1353,8 +1353,8 @@ excerpt: " "
       - Fast convergence
       - flooding is costly：2 \* Nodes \* Lines 的开销
       - Only good for small networks（对于大网络来说开销太大）
-    - ![](https://image.blog.nwdnysl.site/20250115200306-86a21e41306fbc18b32d9833b929cf5c.png)
-    - 路由表如图：![](https://image.blog.nwdnysl.site/20250115200432-da0a72e90456b59289e54f0b01f0858d.png)
+    - ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115200306-86a21e41306fbc18b32d9833b929cf5c.png)
+    - 路由表如图：![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115200432-da0a72e90456b59289e54f0b01f0858d.png)
   - Distance-vector（发的人少 发的内容多）
     - 节点的 advertisements 中包含所有已知节点的 costs 以及是通过哪个邻居到达的
     - 只对邻居进行 advertise
@@ -1398,7 +1398,7 @@ excerpt: " "
   - NETWORK_HANDLE(packet,net_protocol)
     - 检查 dest 如果是自己 则转发给 end_layer
     - 否则查找路由表 并通过 link 层发送给 next_hop
-  - ![](https://image.blog.nwdnysl.site/20250115201120-4fe67a54fa0ca5c96059f883f906c641.png)
+  - ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115201120-4fe67a54fa0ca5c96059f883f906c641.png)
 - Forwarding
   - 查找路由表 如果没有则丢弃
   - TTL（Time To Live）：每经过一个节点 TTL 减一 如果 TTL 为 0 则丢弃 也就是最多转发几次 主要是为了防止 loop
@@ -1417,7 +1417,7 @@ excerpt: " "
   - IPv4 地址不够用 因此拆分为内网和外网地址 外网仍旧是唯一的 而内网地址可以在不同的局域网中复用（IPv6 则不需要 NAT）
   - 内网中的设备不会被外网直接访问 起到了保护作用
 - Router 会保存形如 <Src IP, Src Port, NAT Port> 的映射表 也就是将内网的一个端口映射到了 Router 的一个连接到外网的端口上 如下图：
-  ![](https://image.blog.nwdnysl.site/20250115201457-dfa3724c79f16fa9b17dd54f9e4e7100.png)
+  ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115201457-dfa3724c79f16fa9b17dd54f9e4e7100.png)
 - 网络层的 IP 协议 去修改了 Payload 中的 Port 信息（属于 end layer）破坏了解耦 如果 end layer 更换为一个没有 Port 的协议 则 NAT 就无法工作（现实是 TCP 与 UDP 霸权了）
 
 ## LEC 19: Network: End-to-end Layer
@@ -1450,13 +1450,13 @@ excerpt: " "
   - RARP（Reverse ARP）：通过 MAC 找 IP
 - An Example
   - app 想要给百度发包 先填入 src IP 与 dest IP
-    ![](https://image.blog.nwdnysl.site/20250115202019-defb3c739038c4b211c4d25b8ceed4f9.png)
+    ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115202019-defb3c739038c4b211c4d25b8ceed4f9.png)
   - 这是一个外网 IP 因此会发送给 router 即 src MAC 为自己的 MAC dest MAC 为 router 的 MAC
-    ![](https://image.blog.nwdnysl.site/20250115202053-260276af6aadbbff42edc508f72f4a8b.png)
+    ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115202053-260276af6aadbbff42edc508f72f4a8b.png)
   - router1 收到包后 根据路由找到了下一跳的 IP 地址 并通过 ARP 解析出 MAC 地址 于是 dest MAC 变为 router2 src MAC 变为 router1 同时根据 NAT src IP 变为 router1
-    ![](https://image.blog.nwdnysl.site/20250115202105-91da98451eab20c1738edf97f31e4914.png)
+    ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115202105-91da98451eab20c1738edf97f31e4914.png)
   - router2 和百度位于同一个局域网内 因此包的 dest MAC 变为百度 src MAC 变为 router2 注意 src IP 仍为 router1 否则百度无法回复给正确的 IP 地址
-    ![](https://image.blog.nwdnysl.site/20250115202112-9f6bae929b471af8102664e36191d93c.png)
+    ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115202112-9f6bae929b471af8102664e36191d93c.png)
 - ARP Spoofing：通过伪造 ARP 包来欺骗别人的 ARP 表 从而把数据包发送到 hacker 的设备上 成为了一个中间人
   - 防御方法：ARP Cache Poisoning Detection 也就是监测 ARP 包的流量 异常就会有人给你打电话哈（治标不治本）
   - 也可以通过静态 ARP 表来防御 需要手动添加新设备
@@ -1531,12 +1531,12 @@ excerpt: " "
   - Basic Idea：开始时缓慢增加 cwnd（congestion window）一旦出现丢包则迅速减小 cwmd
   - AIMD（Additive Increase Multiplicative Decrease）：慢慢增加 快速减小 也即 cwnd+=1 遇到丢包则 cwnd/=2 问题在于最开始的增长太慢了
   - Slow start：一开始指数级增加 cwnd 直到出现丢包 之后回到 AIMD
-    ![](https://image.blog.nwdnysl.site/20250115202958-470b1bc24dceb5556e4478fadc19ec66.png)
+    ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115202958-470b1bc24dceb5556e4478fadc19ec66.png)
   - Duplicate ack：出现丢包后 Receiver 会发送重复的 ack 通知 Sender 有包丢失了 用于尽快告知 Sender 丢包 从而调整 cwnd
   - 一旦没有 dup ack 而是 timeout 则说明网络出现了严重的拥塞 会将 cwnd 重置为 1
   - 最终 TCP 通过不断感知丢包 使得发送速率逐渐逼近网络的最大带宽
   - Efficency & Fairness：如果画出二维图 会发现(cwnd1,cwnd2)这个点增长时是沿着 y=x 的方向增长的（因为是+=1） 而减少时则是向着原点减少的（因为是/=2） 最终会收敛到 y=x 上震荡 也就保证了公平性
-    ![](https://image.blog.nwdnysl.site/20250115203026-8babf48bcf25feea986d79a95d3f90f3.png)
+    ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115203026-8babf48bcf25feea986d79a95d3f90f3.png)
 - Weakness of TCP
   - 如果 router 的 buffer 太多 会导致时延很长
   - 无线网的丢包主要是因为信号不好 应该加快速率 由于 TCP 的节流反而会减少速率 导致恶性循环
@@ -1592,7 +1592,7 @@ excerpt: " "
   - value space：值的集合
   - mapping：将名字映射到值的算法
   - context：名字的上下文 比如文件系统的当前目录
-  - ![](https://image.blog.nwdnysl.site/20250115203459-ff0699bc9929c0ac878a2781ce1a25c6.png)
+  - ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115203459-ff0699bc9929c0ac878a2781ce1a25c6.png)
 - Lookup Algorithm
   - recursive lookup：递归查询
   - multiple lookup：多重查询 即逐个依次查询 比如查询 path 中的命令
@@ -1659,7 +1659,7 @@ excerpt: " "
     - 记录离当前节点 1/2 1/4 1/8...的位置 然后进行类似二分的跳跃
     - 如果节点挂掉 finger table 可能会导致错过新存放了数据的节点
     - 结合两者即可解决 节点记录 successor list（每个节点的下 r 个节点）当发现跳跃到的节点挂掉时就可以遍历 successor list 来找到正确的节点 其中网络越稳定 r 越小
-    - ![](https://image.blog.nwdnysl.site/20250115215306-46977b809edfb64725da225965ac5dca.png)
+    - ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115215306-46977b809edfb64725da225965ac5dca.png)
   - Join 新节点
     - 只需要向其 successor 查询一下 并更新自己的 finger table 并不需要修改其他节点的 finger table 因为不会影响实际的查询负载
   - 当节点比较少时 可能会存在负载不均衡的问题
@@ -1691,7 +1691,7 @@ excerpt: " "
   - 性能增益不可能达到理论的倍增 因为指令可能有依赖
   - 有时候访存也会成为性能瓶颈 访存的时间 = Latency + Payload / Bandwidth
   - Roofline Model：刻画算力与带宽的关系图 y 轴是算力 单位是 GFLOP/s 即每秒多少次浮点运算 x 轴是应用利用内存的效率 单位是 Flop/Byte 即读取一个字节数据可以进行多少次运算 于是斜率就是应用对于带宽的需求 单位为 Byte/s 于是设备在图中表示为两条线 一条代表算力的水平线与一条代表带宽的斜线 应用的 OI（Operational Intensity）所落在哪条线 就说明哪个因素是瓶颈
-    ![](https://image.blog.nwdnysl.site/20250115204935-9c262a8d6ff5f140dd0d94241e459d70.png)
+    ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115204935-9c262a8d6ff5f140dd0d94241e459d70.png)
 
 #### GPU
 
@@ -1801,7 +1801,7 @@ excerpt: " "
 
 - 接下来我们终于到达了目的地：分布式训练 下面介绍一下如何使用计算图来进行分布式训练
 - 以所有 AI 模型训练都会用到的梯度下降法为例 可以看到求权重的下一次迭代可以表示为如下的计算图 其中 x 是输入 y 是 label w 是当前权重 最终计算出 dw 来更新权重
-  ![](https://image.blog.nwdnysl.site/20250115205945-a3ed798d7c2e308468ae371eb9f0e8a6.png)
+  ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115205945-a3ed798d7c2e308468ae371eb9f0e8a6.png)
 - 为了分布式训练 我们需要考虑如何实现这个计算的并行化 接下来介绍几种常用的并行化方法
 
 ### Parallelism
@@ -1834,7 +1834,7 @@ excerpt: " "
     - 不断二分 reduce 的方法 即每个节点负责两个子节点的 reduce 最终汇总到根节点上 最终再进行广播
     - 每个节点的通信量是 O(P) 通信轮数是 O(logN) fan-in 为 3（父节点和两个子节点）
     - 然而负载并不均衡（叶与根 fan-in 更少）于是使用 Double Binary Tree Allreduce 将二叉树进行翻转 保证负载均衡
-  - ![](https://image.blog.nwdnysl.site/20250115211247-c46ecf4f8b4ccf371612e4bb43f450c9.png)
+  - ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115211247-c46ecf4f8b4ccf371612e4bb43f450c9.png)
 
 #### Model Parallelism
 
@@ -1940,10 +1940,10 @@ excerpt: " "
 - Instrumentation
   - 在原代码的 jmp 指令前加入一段检查代码 其会检查 jmp 的目标地址是否是某一个硬编码的数据（比如 12345678） 如果不是则不跳转
   - 在目标地址的代码前加入这个硬编码的数据 确保控制流会到这
-    ![](https://image.blog.nwdnysl.site/20250115212113-870e31eeb1d0042ce98ab93ce0c82eca.png)
+    ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115212113-870e31eeb1d0042ce98ab93ce0c82eca.png)
   - 如果第三方库的代码已经加入 data 但是用户的 app 没有加入检查代码 会导致把这段数据当作代码执行
   - 解决方法是使用 prefetch 指令 这个指令遇到无法执行的代码会直接跳过 相当于一个 nop
-    ![](https://image.blog.nwdnysl.site/20250115212127-7f7b1921608500cbc0fb0650ae010edb.png)
+    ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115212127-7f7b1921608500cbc0fb0650ae010edb.png)
 - CFI Precision
   - 如果 A 调用 C B 调用 C 或 D 那么要求 C 的 data 与 D 的 data 必须一样 这就导致 A 是可以合法调用 D 的
   - 解决方法是修改 B 的汇编代码 把原本的`CALL %eax` 变为`CALL C_ADDR`与`CALL D_ADDR`的直接跳转 缺点是增加了代码大小
@@ -2037,9 +2037,9 @@ excerpt: " "
 - 然而 A B 之间是对称的 因此 E 可以把消息发给 A 于是引入了非对称加密
 - 非对称加密是指两端使用不同的密钥进行加密 即 A 使用 ka 加密 使用 kb 解密 B 使用 kb 加密 使用 ka 解密
 - A 与 B 最开始的密钥交换可以通过 DH（Diffie-Hellman）算法来实现
-  ![](https://image.blog.nwdnysl.site/20250115220050-338bc8710f5d121b2ddbd075b3457142.png)
+  ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115220050-338bc8710f5d121b2ddbd075b3457142.png)
 - 虽然 E 无法知道密钥 但是却可以作为中间人来进行攻击 于是引入了数字签名 用于确认消息的发送者到底是谁
-  ![](https://image.blog.nwdnysl.site/20250115220110-95dc4d59744ac5f00abff53564e312f0.png)
+  ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115220110-95dc4d59744ac5f00abff53564e312f0.png)
 - RSA 是一种非对称加密算法 通过公钥加密 私钥解密 实现了数字签名 即 A 把公钥发布给所有人 B 通过公钥加密消息发给 A 只有 A 通过私钥才能解密 也就保证了 A 是消息的发送者 E 无法再发起中间人攻击 因为要想伪装成 B E 需要 B 的私钥
 - 公钥由 CA（Certificate Authority）来签发 维护每个人的公钥
 - 为了方便考虑 不可能每次对话都向 CA 去索要公钥 因此 CA 会对公钥进行签名 也就是证书 需要通信时 对方可以把 CA 签发的证书发给你 你可以通过 CA 的公钥来验证证书的真实性 也就确认了对方的身份 CA 的公钥通常存储在浏览器中
@@ -2057,7 +2057,7 @@ excerpt: " "
   - B 选择一个随机数 r 如果选择 1 则使用 K1 加密 r 得到 c 返回给 A
   - A 用 K0 与 K1 解密 c 得到 r0 与 r1 然后把 e0=r0 xor m0 e1=r1 xor m1 发给 B
   - B 只需要用 r xor e1 就可以得到 m1
-- ![](https://image.blog.nwdnysl.site/20250115222436-5c375678e0a87cd6dd02b37902e008e0.png)
+- ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115222436-5c375678e0a87cd6dd02b37902e008e0.png)
 
 #### DP（Differential Privacy）
 
@@ -2091,7 +2091,7 @@ excerpt: " "
   - HE：如果一个操作 f 可以与加密操作交换 则称为这种加密方式具有 HE
   - SWHE：只能进行有限次某些类型的操作 比如加法和乘法同态性 比如 BFV
   - FHE：可以进行任意次任意类型的操作 即全同态性
-- ![](https://image.blog.nwdnysl.site/20250115222635-eb6978d571c49d328060d8945586fad7.png)
+- ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250115222635-eb6978d571c49d328060d8945586fad7.png)
 
 ### TEE（Trusted Execution Environment）
 

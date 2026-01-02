@@ -69,7 +69,7 @@ excerpt: " "
 - Spring Boot 6 之后如何对请求的 ip 地址进行限制：https://blog.csdn.net/weixin_43162683/article/details/135946939
 
 - Security 处理登录和 session 的逻辑：使用 session 最简单的情况就是把 session 存到一个 map 里维护即可 而 security 为了方便 还多做了几步操作 见下图：
-  ![](https://image.blog.nwdnysl.site/20240925171617-bc5673d0edd810f34c0e5e54e6c91072.png)
+  ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20240925171617-bc5673d0edd810f34c0e5e54e6c91072.png)
 
 - Security 中如何判断 session 是否有效（千万别用 isNew）：https://blog.csdn.net/lisheng19870305/article/details/40738169/
 

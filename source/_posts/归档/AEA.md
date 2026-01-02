@@ -129,7 +129,7 @@ excerpt: " "
   - websocket：一次 websocket 对话创建一个实例
 
 - 数据库连接池=核心数\*2+有效硬盘数 与用户数无关 连接池本质上也是线程 超出 CPU 核心数会导致线程切换 降低性能 超线程可以使得一个核心同时处理两个线程 另外连接池实例除了连接 CPU 还需要 IO 因此再加上硬盘数
-  ![](https://image.blog.nwdnysl.site/image-e386b0b13719a1472c0f8d15c2f006a4.png)
+  ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/image-e386b0b13719a1472c0f8d15c2f006a4.png)
 
 ### 作业：会话计时器
 
@@ -2017,7 +2017,7 @@ excerpt: " "
   - RDD 需要进行分区 Spark 会为每个分区分配一个任务
   - 可以使用`partitionBy`方法来指定分区方式 比如`rdd.partitionBy(new HashPartitioner(2))`就是使用哈希分区器将 RDD 分为 2 个分区
   - 假设有两个 RDD 需要周期性进行 join 操作 其中 A 进行了哈希分区 而 B 没有 从而在 join 操作时 生成的子分区会根据 A 的分区数来决定 如下图所示
-    ![](https://image.blog.nwdnysl.site/20250103192843-c32ff9ff2b070a5fdb7f62539591339a.png)
+    ![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/20250103192843-c32ff9ff2b070a5fdb7f62539591339a.png)
     - Narrow Dependency：窄依赖 即 A 与 joined 的依赖关系 父 RDD 的每个分区只会被子 RDD 的一个分区使用 性能高 并且数据丢失时重计算快 map、filter、union 以及带有 co-partition 的 join 都是窄依赖
     - Wide Dependency：宽依赖 即 B 与 joined 的依赖关系 父 RDD 的每个分区会被子 RDD 的多个分区使用 意味着多个节点之间的数据传输 性能低 groupByKey、不带有 co-partition 的 join 都是宽依赖 会导致 shuffle
 - Stage
