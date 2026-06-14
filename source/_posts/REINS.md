@@ -51,57 +51,6 @@ CEDS 是黄子昂学长的硕士毕业论文中设计的云边融合存储系统
 
 # TODO
 
-## REVIEW
-
-- 评估体系：固定接口、数据格式等其它影响 只对发送规则做区分 探究其收益 论文声称这样的场景更符合实际
-- 问题假设：J是全体回报 z是每一个agent的历史状态编码 P是一个信道模型 用逻辑斯蒂来模拟通信概率 VPB是每比特消息可以带来的团队收益
-- COUNTERCOMM：一个创新的发送规则 用一个GNN来预测团队奖励 节点是每个agent的状态 边则代表了两个agent是否可以通信 每一步决策会先计算每个agent发送b比特消息或不发送的团队收益 然后计算VPB 最后用softmax选取一个VPB较高的b 发送消息
-- 实验：设计了三个场景 计算归一化回报（除以全发机制的回报）并进行消融实验 验证反事实评分与推演步数H的有效性
-- STRENGTHS
-  - 创新的评估体系
-  - 创新的机制带来的效率提升
-  - 充足完整的实验
-- WEAKNESSES
-  - 延迟较高 影响实际应用（高回报率场景、低计算资源平台）
-  - 仿真环境距离实际场景较远 比如信道模型可能过于理想 存在较大的gap
-  - 比特成本的线性假设是否合理？实际场景中 消息通信的开销并不是线性的 存在固定的协议开销 这一事实可能会影响模型的最优性能
-
----
-
-**Review for Paper: "Fixed-Interface Swarm Communication Scheduling: Evaluating Paired Send-Versus-Silent Pricing"**
-
-**Overall Assessment:** This paper presents a well-motivated, controlled, and rigorous study on a specific yet practical problem in multi-agent communication: optimizing the send-rule (scheduler) under a completely fixed communication interface. The core innovation lies in proposing and thoroughly evaluating the "paired send-versus-silent counterfactual pricing" mechanism. The experimental design is exemplary, and the results are compelling within the defined scope. The paper is recommended for publication, as it makes a clear, focused contribution to the field of communication-efficient multi-agent systems. However, its practical deployment readiness is limited by the computational overhead and the simulation-based evaluation.
-
-**Strengths:**
-
-1.  **Innovative Evaluation Framework and Clear Problem Scoping (Novelty of the "Fixed-Interface" Regime):**
-    The paper's greatest strength is its methodological rigor. By _freezing_ the reactive controller shell, the 8-bit VQ payload alphabet, the fitted channel model, and the pooled load target, the authors successfully isolate the variable of interest: **send-rule quality**. This "fixed-interface" setup transforms a typically ambiguous claim about scheduler performance into a clean, falsifiable scientific question. The paper does not aim to beat all communication architectures but to determine if a better scheduling rule can extract more value from an _existing, committed_ workflow. This framing is both novel and highly relevant for real-world systems where low-level stacks are often fixed after deployment.
-
-2.  **Innovative Mechanism and Demonstrated Efficiency Gains (Novelty of the "Paired Pricing" Core):**
-    The proposed **COUNTERCOMM** mechanism is elegant and effective. The core idea of performing short-horizon, paired counterfactual rollouts ("send b bits" vs. "stay silent") to compute a **Value-Per-Delivered-Bit (VPB)** score is a significant conceptual contribution. It moves beyond simple binary triggering or scalar penalty methods. The VPB metric naturally balances the expected marginal team value of a message against its resource cost (bits), internalizing the congestion externality in a decentralized manner. The ablation studies (e.g., Table 2) strongly support the claim that this multi-step, paired pricing is the active ingredient, not just the use of a world model or encoder scaffold.
-
-3.  **Extensive, Rigorous, and Targeted Experimental Suite:**
-    The experimental section is a masterclass in thorough evaluation. The authors go far beyond a simple performance comparison table. Key evidence includes:
-    - **Matched-load fairness:** Strictly comparing methods at the same pooled transmitted bit budget (48.2% of dense broadcast).
-    - **Novelty-critical foils:** Comparing against strong _same-interface_ baselines (Lyapunov-Deadband, Learned Trigger, Adaptive Self-Triggered) rather than richer, incomparable architectures.
-    - **Comprehensive falsification checks:** The paper systematically addresses potential counter-arguments through latency-bounded analysis, information-pattern ablations, channel-model calibration/mismatch tests, heterogeneous-agent holdouts, packet-trace replays, and a second-stack (ROS 2) benchmark. This "evidence package" greatly strengthens the validity of the core claim.
-
-**Weaknesses and Limitations:**
-
-1.  **Non-Trivial Computational Overhead, Impacting Practical Applicability:**
-    The paper transparently reports a median per-agent decision latency of **12.6 ms** for the full COUNTERCOMM (H=5). While this is framed as a "compute-cost boundary," it consumes a substantial portion (~25%) of a 20 Hz (50 ms) control interval _before_ accounting for sensing, actuation, or network transport. This overhead is the direct cost of the multi-step rollouts. Although a cheaper H=1 variant is explored, the highest gains are tied to higher latency. This presents a significant barrier for deployment on real robotic platforms with tight control loops or limited onboard compute.
-
-2.  **Simulation-to-Reality Gap: Channel and Environment Modeling:**
-    The evaluation, while extensive, remains within a **custom simulation framework**. The channel model, though more advanced than a fixed drop rate, is still a fitted logistic function of load and size, not accounting for explicit RF propagation, interference, queueing dynamics, or precise timing jitter. The paper's claims about robustness are therefore bounded by its simulation assumptions.
-
-3.  **Questionable Modeling Assumption: Linear Bit Cost:**
-    A fundamental modeling choice is the **linear relationship between bit count `b` and resource cost** in the VPB denominator (`b + ε`). The authors justify this via their fitted channel model where bit count linearly reduces log-odds of delivery. However, in real-world networks, transmission cost is rarely linear in bits due to protocol overheads (preambles, headers, ACKs), modulation schemes, and the fact that small messages often occupy fixed-duration time slots. This assumption, while simplifying the optimization, may not hold in practice and could affect the optimality of the scheduler's bitrate choices on real hardware.
-
-**Summary and Recommendation:**
-This is a **theoretically strong and methodologically exemplary paper** with clear, impactful contributions to the study of communication scheduling in multi-agent systems. Its "fixed-interface" evaluation paradigm and the "paired counterfactual pricing" mechanism are important conceptual advances supported by exceptionally rigorous experimentation. The primary weaknesses are practical: the computational latency and the simulation-based validation limit immediate deployment readiness. The authors are commendably transparent about these limitations. The work is best viewed as a **foundational study that provides a powerful new tool and evaluation standard for the community**, paving the way for future research into more computationally efficient approximations and physical validation.
-
-**Decision:** **Accept.**
-
 ## AAAI
 
 - 用transformer做自回归的优势到底是？
@@ -115,6 +64,7 @@ This is a **theoretically strong and methodologically exemplary paper** with cle
 ## PHAROS
 
 - 湘家荡：
+  - 继续增加无人机资产的维度表以及查询接口
   - 把4D和CEDS结合起来
   - 接入原CEDS的datareceiver和index部分（主要是数据聚合和查询下推）
 - java 这边的 avro 由于我使用了 fastjson 导致需要先解析为 jsonobject 再进行使用 需要手动分类序列化 未来可以考虑直接使用 avro 的 record 类
