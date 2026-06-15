@@ -1,3 +1,14 @@
+---
+title: PDDS
+date: 2026-06-15 23:32:01
+categories: 课程笔记
+tags:
+index_img:
+banner_img:
+excerpt: " "
+---
+
+
 ## SQL优化
 
 ### Data Model
