@@ -672,7 +672,6 @@ ORDER BY dist          -- <-> L2距离, <=> Cosine, <#> Hamming
 LIMIT 10;              -- TopK 中的 K
 ```
 
----
 
 ### 二、TopK（向量搜索 / ANN）
 
@@ -794,10 +793,6 @@ LIMIT 10;              -- TopK 中的 K
 **小结**：GaussDB 的 AI 能力分为两个方向——**AI4DB** 用 AI 优化优化器与自治运维（基数估计、自调优、DBMind/Doer），**DB4AI** 在库内提供 ML 训练推理、向量检索（DiskANN）和语义算子，支撑 RAG 与 AI 应用一站式开发。两者共用异构计算（GPU/昇腾）、模型管理及安全底座。
 
 ## LEC 8: Distributed Storage: Sequential Consistency
-
-### How to deploy a KVS?
-
-- 以微信为例 数据会部署在服务器和客户端上 就和我暑假做的日程 APP 一样 最大的重点是写时的数据同步 即读写都是本地的 而写会在后台进行与服务端的同步
 
 ### Consistency Model
 
@@ -1131,85 +1126,7 @@ LIMIT 10;              -- TopK 中的 K
   - 并发事务少时 OCC 的性能很好
   - 当并发事务数越多 OCC 的性能会越差 逐渐低于 2PL
 
-### HTM（Hardware Transactional Memory）
-
-- 通过 CPU 硬件来保证事务的原子性
-- 使用 xbegin 和 xend 指令来标记事务的开始和结束 代码如下：
-
-  ```cpp
-  if (xbegin() == _XBEGIN_STARTED) {
-    if condition { //abort manually
-      xabort();
-    }
-    // transactional code
-    xend();
-  } else {
-    // fallback code
-  }
-  ```
-
-- RTM（Restricted Transactional Memory,which is Intel's HTM）实际上是由 OCC 实现的 因此如果其他线程在事务中修改了数据 xbegin 会返回失败 也就进行 fallback 操作
-- Pros
-  - 简单的使用一行代码就可以把任意操作变成事务 并且性能比软件实现要好
-- Cons
-  - 正因为是用 OCC 实现的 所以无法保证成功
-  - 简单的 retry 并不能解决问题 因为很有可能是硬件限制导致事务失败 此时 retry 会一直失败 导致 livelock
-  - 在 retry 一定次数后 考虑转向拿锁 代码如下：
-    ```cpp
-    if (xbegin() == _XBEGIN_STARTED) {
-      if lock.held() // 防止其他核正在进行fallback
-        xabort();
-      // transactional code
-      xend();
-    } else {
-      lock.acquire();
-      // fallback code
-      lock.release();
-    }
-    ```
-
-- Implementation of RTM
-  - RTM 把 read/write set 数据存放在 CPU 的 cache 里 并且使用了 cache coherence 来检测冲突
-    - cache coherence 是指 CPU 的多个核之间如果出现 cache 上的 race condition 进行修改的核会把修改广播给其他核 从而保证数据的一致性
-  - 如果 set 数据大小超出了 CPU cache 的限制 RTM 会无条件 abort 事务
-    - 有趣的事实是 RTM 将 read set 放在 L2 和 L3 cache 里 write set 放在 L1 cache 里 这意味着写操作会更早的达到限制
-  - 事务的执行时间越长 RTM 的 abort 概率越高 因为 CPU 会定期切换上下文来进行调度 而上下文切换会污染 cache 因此 RTM 会无条件 abort 事务
-
-- 对于小事务 HTM 的性能大于所有软件层面的 OCC 对于 TPC-C 这样的大事务 HTM 的性能会较低
-
 ## LEC 13: Distributed Storage: OCC, MVCC & Multi-Site Atomicity
-
-### MVCC（Multi-Version Concurrency Control）
-
-- 为了解决 OCC 的 false aborts 问题 我们需要确定每个数据是否属于同一个时间点 也就需要 COW 来实现多个版本的数据
-- 版本号需要确定时间戳 最通用的方法是 FAA 的全局 counter FAA 有性能瓶颈 但是对于小项目足以
-
-#### Optimize OCC with MVCC
-
-- Try #1
-  1. Concurrent local processing
-     - 获取开始时间戳
-     - 读取离开始时间戳最近的 snapshot
-     - 写入数据到缓存中的 write set 里
-  2. Commit the results in critical section
-     - 获取提交时间戳
-     - 将 write set 写入数据库 同时带上提交时间戳
-- Partial snapshot
-  - 事务 T1 读取 A 和 B 事务 T2 写入 A 和 B 可能会出现以下情况：
-    - T2 提交 获取时间戳为 1 写入 A T1 获取开始时间戳为 2 读取 A 和 B 此时读取 A 的版本号为 1 读取 B 的版本号为 0
-    - 也即事务写入时 有一段时间数据库里的版本是不完整的
-  - 为了保证写的 Isolation 在执行写入之前为每个数据项上锁 等到写完这个数据项后放锁 如果其他事务读取数据时有锁 则等待 这样就不会读取到 partial snapshot
-- 在写入数据库前 还需要检查 write set 中数据在数据库中的版本号是否大于开始时间戳 如果是则意味着有并发事务 终止事务
-- 最终实现：![](https://pub-584d7c8932764afaabeee4dc52e72f6f.r2.dev/b27101bfacda96e75ce51439d213150-6ea217269cc3ed3718e6e04a87c6f195.png)
-- garbage collection：定期清理旧版本数据 维护所有事务的最小开始时间戳 一旦这个时间戳大于版本号 数据就可以被删除
-- Write skew anomaly
-  - 让我们看一个例子：
-    - T1 读取 A 写 B T2 读取 B 写 A
-    - T1 获取开始时间戳为 1 T2 获取开始时间戳为 2 T1 读取 A 的版本号为 0 T2 读取 B 的版本号为 0 T2 先提交 写入 A 的版本号为 3 T1 再提交 写入 B 的版本号为 4
-    - 我们会发现读取 A0 应该在写入 A3 之前 读取 B0 应该在写入 B4 之前 即 T1 和 T2 有冲突环
-  - 也即两个事务同时写入同一个数据 但是写入的数据是不同的 导致没有写写冲突 但是却不是 conflict serializable 的
-  - 最简单的 solution 是：对于读写事务 检查 read set 本质上也就是 OCC 但是对于只读事务 可以不检查
-  - 实际上如上没有 read set 检查的 MVCC 也叫 snapshot isolation 而 MVCC 还可以应用于 2PL 和 OCC 实现 MV-2PL 和 MV-OCC
 
 ### Transaction
 
